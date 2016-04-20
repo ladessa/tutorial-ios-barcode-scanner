@@ -18,6 +18,14 @@ class ViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
     var capturePreviewLayer: AVCaptureVideoPreviewLayer!
     var alertController: UIAlertController!
     
+    override func shouldAutorotate() -> Bool {
+        return false
+    }
+    
+    override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
+        return UIInterfaceOrientationMask.Portrait
+    }
+    
     func initializeScanner() {
         captureSession = AVCaptureSession()
         
@@ -55,6 +63,36 @@ class ViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
         
         capturePreviewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
         capturePreviewLayer.frame = self.view.layer.bounds
+        
+        //Show Bounding area - create a clearColor rectangle with red border - use your barcode`s size
+        let rectangle: UIBezierPath = UIBezierPath(rect: CGRectMake(20, UIScreen.mainScreen().bounds.size.height/2 - 20, UIScreen.mainScreen().bounds.size.width-40, 35))
+        rectangle.lineWidth = 1
+        rectangle.stroke()
+        
+        
+        // UIBezierPath to Layer
+        let boundingLayer: CAShapeLayer = CAShapeLayer.init()
+        boundingLayer.path = rectangle.CGPath
+        boundingLayer.fillColor = UIColor.clearColor().CGColor
+        boundingLayer.strokeColor = UIColor.redColor().CGColor
+        
+        //add your bounding area rectangle on screen
+        capturePreviewLayer.addSublayer(boundingLayer)
+
+        
+        //write a info text in preview layer
+        let label: CATextLayer = CATextLayer()
+        let boundingAreaY : CGFloat = UIScreen.mainScreen().bounds.size.height/2 - 20;
+        label.font = "Helvetica-Bold"
+        label.fontSize = 12
+        label.frame =  CGRectMake(0, boundingAreaY + 60, UIScreen.mainScreen().bounds.size.width, 21)
+        label.string = "Position the barcode within the red lines"
+        label.alignmentMode = kCAAlignmentCenter
+        label.foregroundColor = UIColor.whiteColor().CGColor
+        capturePreviewLayer.addSublayer(label)
+
+        
+        
         capturePreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
         self.view.layer.addSublayer(capturePreviewLayer)
     }
